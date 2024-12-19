@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Navigation } from "lucide-react";
 import { LocationData } from "../types";
+import { getCurrentLocation } from "@/services/geolocation";
+import { Coordinates } from "@/services/geolocation/types";
 
 interface LocationPanelProps {
   onLocationUpdate: (location: LocationData) => void;
@@ -13,21 +15,25 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({
   onLocationUpdate,
 }) => {
   const [address, setAddress] = useState<string>("");
+  const [coordinates, setCoordinates] = useState<Coordinates>({
+    latitude: null,
+    longitude: null,
+  });
 
-  const handleGeolocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          onLocationUpdate({
-            address: "Current Location",
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-        },
-      );
+  // In your React component
+  const handleGetLocation = async () => {
+    try {
+      const location = await getCurrentLocation();
+      setCoordinates(location);
+      //console.log("Location:", location);
+      // Do something with the location
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error getting location:", error.message);
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
+      // Handle the error appropriately
     }
   };
 
@@ -69,13 +75,20 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({
           </div>
 
           <Button
-            onClick={handleGeolocation}
+            onClick={handleGetLocation}
             className="w-full flex items-center justify-center"
           >
             <Navigation className="mr-2 h-4 w-4" />
             Use My Location
           </Button>
         </div>
+        {coordinates.latitude && coordinates.latitude && (
+          <div className="text-sm text-gray-600">
+            Latitude: {coordinates.latitude}°
+            <br />
+            Longitude: {coordinates.longitude}°
+          </div>
+        )}
       </CardContent>
     </Card>
   );

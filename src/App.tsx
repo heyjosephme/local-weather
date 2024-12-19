@@ -5,34 +5,9 @@ import { Button } from "./components/ui/button";
 import { MapPin, Navigation } from "lucide-react";
 import WeatherApp from "./components/weather_app.tsx";
 
-interface Location {
-  latitude: number;
-  longitude: number;
-}
-
 function App() {
   const [location, setLocation] = useState<Location | null>(null);
   const [error, setError] = useState<string>("");
-
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setError("");
-      },
-      () => {
-        setError("Unable to retrieve your location");
-      },
-    );
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
