@@ -6,7 +6,11 @@ export interface LocationData {
 }
 
 export interface WeatherData {
-  temperature?: number;
-  condition?: string;
+  //temperature?: number;
+  //condition?: string;
   // Add more weather properties as needed
+  daily: {
+    temperature_2m_min: number;
+    temperature_2m_max: number;
+  };
 }

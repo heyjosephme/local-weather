@@ -6,11 +6,20 @@ import axios from "axios";
 const fetchWeather = async (
   latitude: number,
   longitude: number
-): Promise<any> => {
+)/* : Promise<any> */ => {
   const response = await axios.get(
     `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
   );
   return response.data.current_weather;
+};
+
+// Fetch coordinates from city name function
+const fetchCoordinates = async (city: string): Promise<{ latitude: number; longitude: number }> => {
+  const response = await axios.get(
+    `https://nominatim.openstreetmap.org/search?city=${city}&format=json`
+  );
+  const data = response.data[0];
+  return { latitude: parseFloat(data.lat), longitude: parseFloat(data.lon) };
 };
 
 const convertTemperature = (
@@ -26,6 +35,7 @@ const WeatherApp: React.FC = () => {
   const [coords, setCoords] = useState<{ latitude: number; longitude: number }>(
     { latitude: 35.6895, longitude: 139.6917 } // Default to Tokyo
   );
+  const [city, setCity] = useState<string>("");
 
   // Fetch user's location
   useEffect(() => {
@@ -49,12 +59,15 @@ const WeatherApp: React.FC = () => {
       queryFn: () => fetchWeather(coords.latitude, coords.longitude),
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-      /* onError: (err) => {
-        console.error("Error fetching weather data:", err);
-      }, */
       enabled: Boolean(coords.latitude && coords.longitude),
     } // Prevents query from running with invalid coordinates
   );
+
+  const handleCitySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newCoords = await fetchCoordinates(city);
+    setCoords(newCoords);
+  };
 
   if (isLoading) return <div>Loading weather...</div>;
   if (isError) return <div>Error fetching weather data</div>;
@@ -65,6 +78,15 @@ const WeatherApp: React.FC = () => {
   return (
     <div>
       <h1>Weather App</h1>
+      <form onSubmit={handleCitySubmit}>
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Enter city name"
+        />
+        <button type="submit">Get Weather</button>
+      </form>
       <p>
         Temperature: {temperature.toFixed(1)}°{unit === "metric" ? "C" : "F"}
       </p>
