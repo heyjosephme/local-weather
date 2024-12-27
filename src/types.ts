@@ -1,6 +1,6 @@
 // types.ts
 export interface LocationData {
-  address: string;
+  address?: string;
   latitude?: number;
   longitude?: number;
 }
