@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import WeatherCard from "./WeatherCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherData, LocationData } from "../types";
 import axios from "axios";
@@ -14,10 +15,10 @@ interface ResponseProps {
 // Fetch weather data function
 const fetchWeather = async (
   latitude: number,
-  longitude: number
+  longitude: number,
 ): Promise<ResponseProps> => {
   const response = await axios.get(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=1`
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=1`,
   );
   return response.data; //.current_weather;
 };
@@ -63,6 +64,7 @@ export const WeatherPanel: React.FC<WeatherPanelProps> = ({ location }) => {
             )}
           </div>
         }
+        <WeatherCard />
       </CardContent>
     </Card>
   );
